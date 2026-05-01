@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblat — Backoffice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Biblat</h1>
+      <p>Literatura latinoamericana</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item" data-section="dashboard" onclick="navigate('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-section="books" onclick="navigate('books')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+        </svg>
+        Libros
+      </div>
+      <div class="nav-item" data-section="api" onclick="navigate('api')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+        </svg>
+        API Docs
+      </div>
+      <div class="nav-item" data-section="settings" onclick="navigate('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Configuración
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="http://localhost:3000/docs" target="_blank">Ver Swagger UI ↗</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Dashboard -->
+    <section id="section-dashboard" class="section">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Resumen de la colección</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Total libros</div>
+          <div class="value" id="stat-books">—</div>
+          <div class="sub">en la base de datos</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Autores</div>
+          <div class="value" id="stat-authors">—</div>
+          <div class="sub">únicos</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Categorías</div>
+          <div class="value" id="stat-categories">—</div>
+          <div class="sub">literaturas regionales</div>
+        </div>
+      </div>
+
+      <div class="page-header" style="margin-bottom:16px">
+        <div><h2 style="font-size:16px">Últimos agregados</h2></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Portada</th>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Año</th>
+              <th>Categoría</th>
+            </tr>
+          </thead>
+          <tbody id="recent-books">
+            <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Cargando...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Libros -->
+    <section id="section-books" class="section">
+      <div class="page-header">
+        <div>
+          <h2>Libros</h2>
+          <p>Gestiona la colección completa</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 4v16m8-8H4"/>
+          </svg>
+          Agregar libro
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Buscar por título o autor…" />
+        </div>
+        <select id="filter-category">
+          <option value="">Todas las categorías</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Portada</th>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Año</th>
+              <th>Categoría</th>
+              <th>ISBN</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="books-tbody">
+            <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Cargando...</div></td></tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span id="pagination-info" style="color:var(--text-muted);font-size:13px"></span>
+          <div class="pagination-btns" id="pagination-pages"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- API Docs -->
+    <section id="section-api" class="section">
+      <div class="page-header">
+        <div>
+          <h2>API Docs</h2>
+          <p>Endpoints públicos disponibles</p>
+        </div>
+        <a href="http://localhost:3000/docs" target="_blank" class="btn btn-ghost">
+          Abrir Swagger ↗
+        </a>
+      </div>
+
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/books</span>
+          <span class="endpoint-desc">Lista paginada · ?page &amp; ?limit &amp; ?category &amp; ?author</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/books/search?q=</span>
+          <span class="endpoint-desc">Búsqueda por título o autor</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/books/:id</span>
+          <span class="endpoint-desc">Un libro por UUID</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/books/isbn/:isbn</span>
+          <span class="endpoint-desc">Buscar por ISBN</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/authors</span>
+          <span class="endpoint-desc">Lista de autores únicos</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/v1/categories</span>
+          <span class="endpoint-desc">Lista de categorías únicas</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/v1/books</span>
+          <span class="endpoint-desc">Crear libro · requiere x-api-key</span>
+        </div>
+        <div class="endpoint">
+          <span class="method put">PUT</span>
+          <span class="endpoint-path">/v1/books/:id</span>
+          <span class="endpoint-desc">Editar libro · requiere x-api-key</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/v1/books/:id</span>
+          <span class="endpoint-desc">Eliminar libro · requiere x-api-key</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuración -->
+    <section id="section-settings" class="section">
+      <div class="page-header">
+        <div>
+          <h2>Configuración</h2>
+          <p>API key para operaciones de escritura</p>
+        </div>
+      </div>
+
+      <div class="apikey-box">
+        <p>La API key se requiere para crear, editar y eliminar libros. Se guarda en localStorage del navegador.</p>
+        <div class="apikey-input-row">
+          <input type="password" id="api-key-input" placeholder="tu-api-key-secreta" />
+          <button class="btn btn-primary" onclick="saveApiKey()">Guardar</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal agregar/editar libro -->
+<div class="modal-overlay" id="book-modal">
+  <div id="modal-overlay-bg" style="position:absolute;inset:0"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Agregar libro</h3>
+      <button class="modal-close" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <form id="book-form">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Título *</label>
+          <input type="text" id="f-title" required placeholder="Cien años de soledad" />
+        </div>
+        <div class="field full">
+          <label>Autor *</label>
+          <input type="text" id="f-author" required placeholder="Gabriel García Márquez" />
+        </div>
+        <div class="field">
+          <label>Año</label>
+          <input type="number" id="f-year" placeholder="1967" min="1000" max="2100" />
+        </div>
+        <div class="field">
+          <label>Editorial</label>
+          <input type="text" id="f-editorial" placeholder="Sudamericana" />
+        </div>
+        <div class="field">
+          <label>Categoría</label>
+          <input type="text" id="f-category" placeholder="Literatura Colombiana" />
+        </div>
+        <div class="field">
+          <label>ISBN</label>
+          <input type="text" id="f-isbn" placeholder="978-84-376-0494-7" />
+        </div>
+        <div class="field full">
+          <label>URL portada</label>
+          <input type="url" id="f-cover-url" placeholder="https://covers.openlibrary.org/b/id/…" />
+        </div>
+        <div class="field full">
+          <label>Subject (Open Library)</label>
+          <input type="text" id="f-subject" placeholder="colombian_literature" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
