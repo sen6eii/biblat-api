@@ -43,6 +43,16 @@ app.get('/', (req, res) => {
   });
 });
 
+// Debug endpoint para verificar conexión a Supabase
+app.get('/health', async (req, res) => {
+  const supabase = require('./db/supabase');
+  const { count, error } = await supabase.from('books').select('*', { count: 'exact', head: true });
+  if (error) {
+    return res.status(500).json({ db: 'error', message: error.message, hint: error.hint });
+  }
+  res.json({ db: 'ok', books: count, env: { supabase_url: !!process.env.SUPABASE_URL, supabase_key: !!process.env.SUPABASE_KEY } });
+});
+
 // Rutas v1
 app.use('/v1/books', booksRouter);
 app.use('/v1/authors', authorsRouter);
