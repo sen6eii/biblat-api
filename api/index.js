@@ -46,17 +46,25 @@ app.get('/', (req, res) => {
 
 // Debug endpoint para verificar conexión a Supabase
 app.get('/health', async (req, res) => {
-  const supabase = require('./db/supabase');
   const env = {
     supabase_url: process.env.SUPABASE_URL ? process.env.SUPABASE_URL.slice(0, 30) + '...' : 'MISSING',
     supabase_key: process.env.SUPABASE_KEY ? 'SET' : 'MISSING',
     node_env: process.env.NODE_ENV || 'undefined'
   };
-  const { count, error } = await supabase.from('books').select('*', { count: 'exact', head: true });
-  if (error) {
-    return res.status(500).json({ db: 'error', error: JSON.stringify(error), env });
+
+  // Test raw fetch a Supabase REST
+  try {
+    const rawRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/books?select=id&limit=1`, {
+      headers: {
+        'apikey': process.env.SUPABASE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_KEY}`
+      }
+    });
+    const rawBody = await rawRes.text();
+    return res.json({ status: rawRes.status, body: rawBody.slice(0, 300), env });
+  } catch (e) {
+    return res.status(500).json({ fetch_error: e.message, cause: e.cause?.message, env });
   }
-  res.json({ db: 'ok', books: count, env });
 });
 
 // Rutas v1
